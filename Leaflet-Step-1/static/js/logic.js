@@ -72,14 +72,37 @@ function createMap(earthquakes) {
   accessToken: API_KEY
   });
 
+  var satellitemap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+  attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+  maxZoom: 18,
+  id: "mapbox.satellite",
+  accessToken: API_KEY
+  });
+
+//Create the FaultLine layer
+  var faultLine = new L.LayerGroup();
+
+  var faultlinequery = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_plates.json";
+
+  // Add the faultline layer
+    d3.json(faultlinequery, function(data) {
+        L.geoJSON(data, {
+        style: function() {
+            return {color: "orchid", fillOpacity: 0}
+        }
+      }).addTo(faultLine)
+    })
+
   // Define a baseMaps object to hold our base layers
   var baseMaps = {
     "Light Map": light,
+    "Satellite Map": satellitemap
   };
 
   // Create overlay object to hold our overlay layer
   var overlayMaps = {
-    Earthquakes: earthquakes
+    Earthquakes: earthquakes,
+    FaultLines: faultLine
   };
 
   // Create our map, giving it the streetmap and earthquakes layers to display on load
@@ -88,7 +111,7 @@ function createMap(earthquakes) {
       37.09, -95.71
     ],
     zoom: 5,
-    layers: [light, earthquakes]
+    layers: [light, earthquakes,faultLine]
   });
 
   // Create a layer control
@@ -97,4 +120,8 @@ function createMap(earthquakes) {
   L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
   }).addTo(myMap);
+
+
+
+
 }
