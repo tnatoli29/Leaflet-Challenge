@@ -10,6 +10,31 @@ d3.json(url, function(data) {
   //console.log(data.features[0].properties.mag)
 });
 
+function radiusSize(mag) {
+     return mag * 15000;
+     }
+
+function circleColor(mag) {
+    if (mag > 5) {
+      return "#B22222"
+        }
+    else if (mag > 4) {
+      return "#C71585"
+        }
+    else if (mag > 3) {
+      return "#F4A460"
+        }
+    else if (mag > 2) {
+      return "#FFFF00"
+        }
+    else if (mag > 1) {
+      return "#ADFF2F"
+        }
+    else {
+      return "#00BFFF"
+        }
+      }
+
 
 function createFeatures(earthquakeData) {
 
@@ -21,30 +46,6 @@ function createFeatures(earthquakeData) {
       "</h3><hr><p>" + new Date(feature.properties.time) + "</p>");
   }
 
-  function radiusSize(mag) {
-      return mag * 15000;
-     }
-
-  function circleColor(mag) {
-    if (mag < 1) {
-      return "#ADFF2F"
-        }
-    else if (mag < 2) {
-      return "#FFFF00"
-        }
-    else if (mag < 3) {
-      return "#F4A460"
-        }
-    else if (mag < 4) {
-      return "#C71585"
-        }
-    else if (mag < 5) {
-      return "#B22222"
-        }
-    else {
-      return "#00BFFF"
-        }
-      }
 
   // Create a GeoJSON layer containing the features array on the earthquakeData object
   // Run the onEachFeature function once for each piece of data in the array
@@ -121,7 +122,23 @@ function createMap(earthquakes) {
     collapsed: false
   }).addTo(myMap);
 
+  //Create Legend
+    var legend = L.control({ position: "bottomright" });
+    //console.log(L);
+    //console.log(legend);
+    legend.onAdd = function () {
+        var div = L.DomUtil.create("div", "info legend");
+        var mag = [0, 1, 2, 3, 4, 5];
 
+        for (var i = 0; i < mag.length; i++) {
+            div.innerHTML +=
+                '<i style="background:' + circleColor(mag[i] + 1) + '"></i> ' +
+                mag[i] + (mag[i + 1] ? '&ndash;' + mag[i + 1] + '<br>' : '+');
+        }
+
+        return div;
+    };
+    legend.addTo(myMap);
 
 
 }
